@@ -3,13 +3,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entity/user.entity';
 import { UsersModule } from './users/users.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auths/auths/auths.guard';
+import { CacheModule } from '@nestjs/cache-manager';
+import { AuthsModule } from './auths/auths/auths.module';
+import { JwtModule } from '@nestjs/jwt';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath:'.env'
+      envFilePath: '.env'
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -25,8 +30,20 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 120000, // milliseconds
+      max: 100, // maximum number of items in cache
+    }),
     UsersModule,
+    AuthsModule,
+    JwtModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule { }
