@@ -3,7 +3,9 @@ import { AuthsService } from "./auths.service";
 import { LoginDto } from "./dto/login.dto";
 import { Public } from "./auths.decorator";
 import { SignupDto } from "./dto/signup.dto";
-import { VerifyOtpSignupDto } from "./dto/verify-otp-signup.dto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto";
+import { ForgetPasswordDto } from "./dto/forget-password.dto";
+import { ResetForgetPassword } from "./dto/reset-forget-password.dto";
 
 @Controller('auths')
 export class AuthsController {
@@ -25,7 +27,34 @@ export class AuthsController {
 
     @Public()
     @Post('verify-otp-signup')
-    async verifyOtpSignup(@Body() verifyOtpSignupDto: VerifyOtpSignupDto): Promise<any> {
+    async verifyOtpSignup(@Body() verifyOtpSignupDto: VerifyOtpDto): Promise<any> {
         return this.authsService.verifyOtpSignup(verifyOtpSignupDto.email, verifyOtpSignupDto.otp);
     }
+
+    @Public()
+    @Post('forget-password')
+    async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto): Promise<any> {
+        return this.authsService.forgetPassword(forgetPasswordDto.email);
+    }
+
+    @Public()
+    @Post('verify-otp-forget-password')
+    async verifyOtpForgetPassword(@Body() verifyOtpForgetPasswordDto: VerifyOtpDto): Promise<any> {
+        return this.authsService.verifyOtpForgetPassword(
+            verifyOtpForgetPasswordDto.email, 
+            verifyOtpForgetPasswordDto.otp
+        );
+    }
+
+    @Public()
+    @Post('reset-forget-password')
+    async resetForgetPassword(@Body() resetForgetPasswordDto: ResetForgetPassword): Promise<any> {
+        return this.authsService.resetForgetPassword(
+            resetForgetPasswordDto.sercurityToken, 
+            resetForgetPasswordDto.newPassword
+        );
+    }
+
+    
+
 }

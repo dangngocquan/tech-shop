@@ -1,4 +1,4 @@
-export class VerifyOtpSignupDto {
+export class VerifyOtpDto {
     email: string;
     otp: string;
 }
