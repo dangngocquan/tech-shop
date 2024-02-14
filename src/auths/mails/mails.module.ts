@@ -27,7 +27,7 @@ import { MailsService } from "./mails.service";
                     options: {
                         strict: true,
                     },
-                },
+                }
             }),
             inject: [ConfigService],
         }),

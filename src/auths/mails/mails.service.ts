@@ -9,10 +9,10 @@ export class MailsService {
     ) {}
 
     async sendEmailConfirmation(email: string, otp: string): Promise<any> {
-        return this.mailerService.sendMail({
+        return await this.mailerService.sendMail({
           to: email,
           subject: '[Tech Shop] Email Verification',
-          template: './confirmation', // `.hbs` extension is appended automatically
+          template: "./confirmation", // `.hbs` extension is appended automatically
           context: {
             name: email,
             otp,
