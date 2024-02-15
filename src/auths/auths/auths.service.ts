@@ -5,6 +5,7 @@ import { UsersService } from "src/users/users.service";
 import { MailsService } from "../mails/mails.service";
 import { User } from "src/users/entity/user.entity";
 import { ConfigService } from "@nestjs/config";
+import { LoginTicket, OAuth2Client } from "google-auth-library";
 
 @Injectable()
 export class AuthsService {
@@ -129,6 +130,93 @@ export class AuthsService {
         await this.userService.updatePassword(user.id, newPassword);
         
         return this.login(user.email, newPassword);
+    }
+
+    // verify google token
+    async verifyGoogleToken(token: string): Promise<{}> {
+        const client = new OAuth2Client(
+            this.configService.get<string>('GOOGLE_CLIENT_ID'),
+            this.configService.get<string>('GOOGLE_CLIENT_SECRET')
+        );
+        var ticket: LoginTicket;
+        try {
+            ticket = await client.verifyIdToken({
+                idToken: token,
+                audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+            });
+        } catch {
+            throw new UnauthorizedException(
+                'Verify google failed.'
+            );
+        }
+        return ticket.getPayload();
+    }
+
+    // Login by google
+    async loginGoogle(token: string): Promise<any> {
+        const profile = await this.verifyGoogleToken(token);
+        // profile = {
+        //     "iss": "https://accounts.google.com",
+        //     "azp": "407408718192.apps.googleusercontent.com",
+        //     "aud": "407408718192.apps.googleusercontent.com",
+        //     "sub": "112249634453935320421",
+        //     "email": "dangngocquan104@gmail.com",
+        //     "email_verified": true,
+        //     "at_hash": "x35gfzbsg9OaSamct9099A",
+        //     "name": "Quân Đặng Ngọc",
+        //     "picture": "https://lh3.googleusercontent.com/a/ACg8ocJnCEN8XeXg560r08AHPMaR-CVvinuy2C1hWniDinojK20=s96-c",
+        //     "given_name": "Quân",
+        //     "family_name": "Đặng Ngọc",
+        //     "locale": "en",
+        //     "iat": 1707986067,
+        //     "exp": 1707989667
+        // }
+        const existUser = await this.userService.get({email: profile['email']});
+        if (!existUser) {
+            throw new UnauthorizedException({
+                describe: 'This email is not registered.',
+            });
+        }
+        // Return token
+        const payload = {
+            id: existUser.id,
+            email: existUser.email,
+            name: existUser.name,
+            role: existUser.role,
+        }
+        return {
+            token: await this.jwtService.signAsync(payload),
+        }
+    }
+
+    async signupGoogle(token: string) {
+        const profile = await this.verifyGoogleToken(token);
+        const existUser = await this.userService.get({email: profile['email']});
+        if (!existUser) {
+            // Create random password
+            const password: string = (1000000 +  Math.round(Math.random() * 999999)).toString().slice(1);
+            // Create user in database
+            const user = new User();
+            user.email = profile['email'];
+            user.password = password;
+            user.name = profile['name'];
+            await this.userService.create(user);
+            // Send email register success
+            await this.mailsService.sendEmailDefaultPassword(user.email, user.password);
+            // Login
+            return this.login(user.email, user.password);
+        } else {
+            // Return token
+            const payload = {
+                id: existUser.id,
+                email: existUser.email,
+                name: existUser.name,
+                role: existUser.role,
+            }
+            return {
+                token: await this.jwtService.signAsync(payload),
+            }
+        }
     }
 
 }

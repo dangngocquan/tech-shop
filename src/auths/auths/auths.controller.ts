@@ -6,6 +6,7 @@ import { SignupDto } from "./dto/signup.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { ForgetPasswordDto } from "./dto/forget-password.dto";
 import { ResetForgetPassword } from "./dto/reset-forget-password.dto";
+import { GoogleDto } from "./dto/google.dto";
 
 @Controller('auths')
 export class AuthsController {
@@ -55,6 +56,15 @@ export class AuthsController {
         );
     }
 
-    
+    @Public()
+    @Post('login-google')
+    async loginGoogle(@Body() loginGoogleDto: GoogleDto): Promise<any> {
+        return this.authsService.loginGoogle(loginGoogleDto.idToken);
+    }
 
+    @Public()
+    @Post('signup-google')
+    async signupGoogle(@Body() signupGoogleDto: GoogleDto): Promise<any> {
+        return this.authsService.signupGoogle(signupGoogleDto.idToken);
+    }
 }

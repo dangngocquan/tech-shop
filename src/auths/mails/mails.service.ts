@@ -19,4 +19,16 @@ export class MailsService {
           },
         });
     }
+
+    async sendEmailDefaultPassword(email: string, password: string): Promise<any> {
+      return await this.mailerService.sendMail({
+        to: email,
+        subject: '[Tech Shop] Register Successfully',
+        template: "./account-infor", // `.hbs` extension is appended automatically
+        context: {
+          name: email,
+          password,
+        },
+      });
+    }
 }
