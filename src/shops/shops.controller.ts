@@ -1,4 +1,4 @@
-import { Body, Controller, Get, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { ShopsService } from "./shops.service";
 import { Public } from "src/auths/auths/auths.decorator";
 import { Shop } from "./entity/shop.entity";
@@ -23,13 +23,22 @@ export class ShopsController {
     }
 
     @Post()
-    @UseGuards(PolicyGuard)
-    @CheckPolicies([Policy.CreateShop])
-    async create(@Body() createShopDto: Shop): Promise<Shop> {
-        return this.shopsService.create(createShopDto.name, createShopDto.ownerId);
+    async create(@Body() createShopDto: Shop, @Req() request): Promise<Shop> {
+        return this.shopsService.create(createShopDto.name, request['user']['id']);
     }
 
+    @Put(':id')
+    @UseGuards(PolicyGuard)
+    @CheckPolicies([Policy.UpdateShop])
+    async update(@Param('id', ParseIntPipe) id, @Body() updateShopDto: Shop) {
+        return this.shopsService.update(id, {name: updateShopDto.name});
+    }
 
-
+    @Delete(':id')
+    @UseGuards(PolicyGuard)
+    @CheckPolicies([Policy.DeleteShop])
+    async delete(@Param('id', ParseIntPipe) id) {
+        return this.shopsService.delete(id);
+    }
 
 }
