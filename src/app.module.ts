@@ -10,6 +10,8 @@ import { AuthsModule } from './auths/auths/auths.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ShopsModule } from './shops/shops.module';
 import { Shop } from './shops/entity/shop.entity';
+import { Product } from './products/entity/product.entity';
+import { ProductsModule } from './products/products.module';
 
 
 @Module({
@@ -27,7 +29,7 @@ import { Shop } from './shops/entity/shop.entity';
         username: configService.get<string>('POSTGRESQL_USER'),
         password: configService.get<string>('POSTGRESQL_PASSWORD'),
         database: configService.get<string>('POSTGRESQL_DATABASE'),
-        entities: [User, Shop],
+        entities: [User, Shop, Product],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -41,6 +43,7 @@ import { Shop } from './shops/entity/shop.entity';
     AuthsModule,
     JwtModule,
     ShopsModule,
+    ProductsModule,
   ],
   providers: [
     {

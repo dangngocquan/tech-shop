@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Shop } from "src/shops/entity/shop.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('user')
 export class User {
@@ -16,4 +17,7 @@ export class User {
 
     @Column({type: 'varchar', length: 255, default: 'member'})
     role: string;
+
+    @OneToMany(() => Shop, (shop: Shop) => shop.owner)
+    shops: Shop[];
 }

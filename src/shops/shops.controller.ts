@@ -9,7 +9,7 @@ import { Policy } from "src/auths/policies/policy.enum";
 @Controller('shops')
 export class ShopsController {
     constructor(
-        private shopsService: ShopsService
+        public shopsService: ShopsService
     ) { }
 
     @Public()
@@ -29,14 +29,14 @@ export class ShopsController {
 
     @Put(':id')
     @UseGuards(PolicyGuard)
-    @CheckPolicies([Policy.UpdateShop])
+    @CheckPolicies(Policy.UpdateShop)
     async update(@Param('id', ParseIntPipe) id, @Body() updateShopDto: Shop) {
         return this.shopsService.update(id, {name: updateShopDto.name});
     }
 
     @Delete(':id')
     @UseGuards(PolicyGuard)
-    @CheckPolicies([Policy.DeleteShop])
+    @CheckPolicies(Policy.DeleteShop)
     async delete(@Param('id', ParseIntPipe) id) {
         return this.shopsService.delete(id);
     }

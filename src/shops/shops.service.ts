@@ -15,6 +15,7 @@ export class ShopsService {
             where: {
              ...options,
             },
+            relations: ['owner', 'products'],
         });
     }
 
