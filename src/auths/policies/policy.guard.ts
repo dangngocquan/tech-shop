@@ -55,9 +55,10 @@ export class PolicyGuard implements CanActivate {
         if (policyName === Policy.UpdateProduct || policyName === Policy.DeleteProduct) {
             const products = await this.productsService.get({
                 id: request['params']['id']
-            })
+            });
             if (products.length === 0) return false;
             return products[0].shop.ownerId === request['user']['id'];
         }
+        
     }
 }
