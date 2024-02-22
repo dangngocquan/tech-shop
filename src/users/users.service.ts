@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entity/user.entity";
 import { Repository } from "typeorm";
+import { Role } from "src/auths/roles/role.entity";
 
 @Injectable()
 export class UsersService {
@@ -22,6 +23,15 @@ export class UsersService {
                 ...options,
             },
             relations: ['shops']
+        })
+    }
+
+    async getPermissions(userId: number) : Promise<any> {
+        return this.userRepository.findOne({
+            where: {
+                id: userId,
+            },
+            relations: ['roles'],
         })
     }
 
